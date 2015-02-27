@@ -1,0 +1,93 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Test Upload</title>
+
+		<style>
+  .prog-border {
+  height: 15px;
+  width: 205px;
+  background: #fff;
+  border: 1px solid #000;
+  margin: 0;
+  padding: 0;
+  }
+
+  .prog-bar {
+  height: 11px;
+  margin: 2px;
+  padding: 0px;
+  background: #178399;
+  font-size: 10pt;
+  }
+  body{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+  }
+  </style>
+  <script src="./scripts/jquery.js"></script>
+  <script src="./scripts/jquery-ui.js"></script>
+<script src="prototype.js" language="JavaScript" type="text/javascript"></script>
+<script type="text/javascript" language="JavaScript">
+  var updater = null;
+
+  function startStatusCheck()
+  {
+    
+    $('submitButton').disabled = false;
+  
+    updater = new Ajax.PeriodicalUpdater(
+                                'status',
+                                'fileupload',
+                                {asynchronous:true, frequency:0.1, method: 'get', parameters: 'c=status&t='+new Date(), onFailure: reportError});
+  }
+
+  function reportError(request)
+  {
+    $('submitButton').disabled = false;
+
+    $('status').innerHTML = '<div class="error"><b>Error communicating with server. Please try again.</b></div>';
+  }
+
+  function killUpdate(message)
+  {
+    $('submitButton').disabled = false;
+    if(null!=updater)
+    {
+ 
+    	updater.stop();
+    }
+    if(message != '')
+    {
+      $('status').innerHTML = '<div class="error"><b>Error processing results: ' + message + '</b></div>';
+    }
+    else
+    {
+
+      new Ajax.Updater('status',
+                     'fileupload',
+                     {asynchronous:true, method: 'get', parameters: 'c=status', onFailure: reportError});
+    }
+  }
+  </script>
+  
+	</head>
+	<body onload="startStatusCheck();">
+
+
+		<iframe id='target_upload' name='target_upload' src=''
+			style='display: none'></iframe>
+		
+		<form enctype="multipart/form-data" name="fileform" id="fileform" method="post"
+			action="fileupload" onsubmit="startStatusCheck();"
+			target="target_upload">
+			<BR>
+			Choose file:
+			<BR>
+			<input name="importFile" type="file">
+			<input id="submitButton" type="submit" value="Upload" />
+		</form>
+
+		<div id="status"></div>
+	</body>
+</html>
